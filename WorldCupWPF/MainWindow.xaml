@@ -1,0 +1,34 @@
+﻿<Window x:Class="WorldCupWPF.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WorldCupWPF"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="680" Width="800">
+    <Grid Margin="0,0,-17,0">
+        <ComboBox x:Name="TeamCB" HorizontalAlignment="Left" Margin="92,53,0,0" VerticalAlignment="Top" Width="120" SelectionChanged="TeamCB_SelectionChanged"/>
+        <ComboBox x:Name="OpponentTeamCB" SelectionChanged="OpponentTeamCB_SelectionChanged" HorizontalAlignment="Left" Margin="588,53,0,0" VerticalAlignment="Top" Width="120"/>
+        <Label Content="Team " HorizontalAlignment="Left" Margin="114,17,0,0" VerticalAlignment="Top" Width="98"/>
+        <Label Content="Opponent" HorizontalAlignment="Left" Margin="588,22,0,0" VerticalAlignment="Top" Width="98"/>
+        <Image x:Name="firstTeamFlag" HorizontalAlignment="Left" Height="58" Margin="129,94,0,0" VerticalAlignment="Top" Width="68"/>
+        <Image x:Name="secondTeamFlag" HorizontalAlignment="Left" Height="58" Margin="603,94,0,0" VerticalAlignment="Top" Width="68" RenderTransformOrigin="0.527,0.047"/>
+        <TextBlock x:Name="matchResultTB" HorizontalAlignment="Center" Margin="0,51,0,0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top" Height="24" Width="80"/>
+        <Button x:Name="TeamInfoButton" Content="View Team Info" HorizontalAlignment="Left" Margin="10,25,0,0" VerticalAlignment="Top" Width="87" Click="TeamInfoButton_Click"/>
+        <Button x:Name="OpponentInfoButton" Content="View Team Info" HorizontalAlignment="Left" Margin="686,25,0,0" VerticalAlignment="Top" Width="100" RenderTransformOrigin="0.452,-0.568" Click="OpponentInfoButton_Click"/>
+        <Grid x:Name="LoadingOverlay" Visibility="Collapsed" Background="#80000000" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+            <ProgressBar IsIndeterminate="True" Width="200" Height="20" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+        </Grid>
+        <StackPanel HorizontalAlignment="Left" Height="8" Margin="882,-247,0,0" VerticalAlignment="Top" Width="1074"/>
+        <Grid>
+            <!-- Background Image for Football Field -->
+            <Image Source="Images/Football_Field.jpg"
+               Stretch="UniformToFill"
+               HorizontalAlignment="Center"
+               VerticalAlignment="Center" Width="300" Height="420" />
+
+            <!-- Placeholder for Player Controls -->
+            <Canvas x:Name="FieldCanvas" />
+        </Grid>
+    </Grid>
+</Window>

@@ -1,0 +1,17 @@
+﻿<Window x:Class="WorldCupWPF.TeamDetailsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Team Details" Height="400" Width="300">
+    <StackPanel Margin="10">
+        <TextBlock Text="Team Details" FontSize="18" FontWeight="Bold" Margin="0,0,0,10"/>
+        <TextBlock x:Name="CountryNameText" FontSize="14"/>
+        <TextBlock x:Name="FifaCodeText" FontSize="14"/>
+        <TextBlock x:Name="GamesPlayedText" FontSize="14"/>
+        <TextBlock x:Name="WinsText" FontSize="14"/>
+        <TextBlock x:Name="DrawsText" FontSize="14"/>
+        <TextBlock x:Name="LossesText" FontSize="14"/>
+        <TextBlock x:Name="GoalsForText" FontSize="14"/>
+        <TextBlock x:Name="GoalsAgainstText" FontSize="14"/>
+        <TextBlock x:Name="GoalDifferenceText" FontSize="14"/>
+    </StackPanel>
+</Window>
