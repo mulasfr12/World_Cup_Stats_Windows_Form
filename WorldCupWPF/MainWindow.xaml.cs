@@ -334,49 +334,6 @@ namespace WorldCupWPF
             teamDetailsWindow.Show();
         }
 
-        private Point GetPositionOnField(string position, bool isHomeTeam)
-        {
-            switch (position)
-            {
-                case "Goalie":
-                    return isHomeTeam ? new Point(50, 200) : new Point(450, 200);
-                case "Defender":
-                    return isHomeTeam ? new Point(100, 150) : new Point(400, 150);
-                case "Midfield":
-                    return isHomeTeam ? new Point(200, 200) : new Point(300, 200);
-                case "Forward":
-                    return isHomeTeam ? new Point(300, 250) : new Point(200, 250);
-                default:
-                    return new Point(0, 0);
-            }
-        }
-        //private void DisplayStartingEleven(List<Country.StartingEleven> startingEleven, bool isHomeTeam)
-        //{
-        //    foreach (var player in startingEleven)
-        //    {
-        //        PlayerControl playerControl = new PlayerControl
-        //        {
-        //            PlayerName = player.name,
-        //            ShirtNumber = player.shirt_number,
-        //            // Assuming you have a method to get player images
-        //            PositionIconSource = GetPlayerImage(player.name)
-        //        };
-
-        //        Point position = GetPositionOnField(player.position, isHomeTeam);
-        //        Canvas.SetLeft(playerControl, position.X);
-        //        Canvas.SetTop(playerControl, position.Y);
-
-        //        FieldCanvas.Children.Add(playerControl);
-        //    }
-        //}
-        //List<Country.StartingEleven> homeStartingEleven = homeTeamStats.starting_eleven;
-        //List<Country.StartingEleven> awayStartingEleven = awayTeamStats.starting_eleven;
-
-        //private void ShowStartingLineups()
-        //{
-        //    DisplayStartingEleven(homeStartingEleven, isHomeTeam: true);
-        //    DisplayStartingEleven(awayStartingEleven, isHomeTeam: false);
-        //}
-        ///
+        
     }
 }

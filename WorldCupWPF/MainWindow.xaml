@@ -20,15 +20,6 @@
             <ProgressBar IsIndeterminate="True" Width="200" Height="20" VerticalAlignment="Center" HorizontalAlignment="Center"/>
         </Grid>
         <StackPanel HorizontalAlignment="Left" Height="8" Margin="882,-247,0,0" VerticalAlignment="Top" Width="1074"/>
-        <Grid>
-            <!-- Background Image for Football Field -->
-            <Image Source="Images/Football_Field.jpg"
-               Stretch="UniformToFill"
-               HorizontalAlignment="Center"
-               VerticalAlignment="Center" Width="300" Height="420" />
-
-            <!-- Placeholder for Player Controls -->
-            <Canvas x:Name="FieldCanvas" />
-        </Grid>
+        
     </Grid>
 </Window>
