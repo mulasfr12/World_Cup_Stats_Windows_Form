@@ -377,6 +377,6 @@ namespace WorldCupWPF
         //    DisplayStartingEleven(homeStartingEleven, isHomeTeam: true);
         //    DisplayStartingEleven(awayStartingEleven, isHomeTeam: false);
         //}
-
+        ///
     }
 }
