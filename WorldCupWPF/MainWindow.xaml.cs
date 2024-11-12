@@ -241,17 +241,63 @@ namespace WorldCupWPF
             }
         }
 
-         private void TeamCB_SelectionChanged(object sender, SelectionChangedEventArgs e)
+         private async void TeamCB_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             matchResultTB.Text = "--";
             LoadOpponentTeams(); // Populate OpponentTeamCB based on the selected team
+            await UpdateLineups();
         }
 
-        private void OpponentTeamCB_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private async void OpponentTeamCB_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             // Display match result when opponent team is selected
             DisplayMatchResult();
+            await UpdateLineups();
         }
+
+        private async Task UpdateLineups()
+        {
+            if (!(TeamCB.SelectedItem is string homeTeamText) || !(OpponentTeamCB.SelectedItem is string awayTeamText))
+                return;
+
+            var homeTeamCode = ExtractFifaCode(homeTeamText);
+            var awayTeamCode = ExtractFifaCode(awayTeamText);
+
+            string baseEndpoint = "https://worldcup-vua.nullbit.hr";
+            string genderEndpoint = _isMen ? $"{baseEndpoint}/men/matches" : $"{baseEndpoint}/women/matches";
+
+            var matches = await _dataService.GetMatchesData(genderEndpoint, _isMen);
+
+            if (matches == null || !matches.Any())
+            {
+                MessageBox.Show("No match data available.");
+                return;
+            }
+
+            // Find the match based on the selected teams
+            var match = matches.FirstOrDefault(m =>
+                m.home_team?.code?.Equals(homeTeamCode, StringComparison.OrdinalIgnoreCase) == true &&
+                m.away_team?.code?.Equals(awayTeamCode, StringComparison.OrdinalIgnoreCase) == true);
+
+            if (match != null)
+            {
+                if (match.home_team_statistics?.starting_eleven != null &&
+                    match.away_team_statistics?.starting_eleven != null)
+                {
+                    // Display the starting lineups
+                    DisplayLineups(match.home_team_statistics.starting_eleven, match.away_team_statistics.starting_eleven);
+                }
+                else
+                {
+                    MessageBox.Show("Starting lineup data is missing for one or both teams.");
+                }
+            }
+            else
+            {
+                MessageBox.Show("No match found for the selected teams.");
+            }
+        }
+
 
         private async void TeamInfoButton_Click(object sender, RoutedEventArgs e)
         {
@@ -333,7 +379,65 @@ namespace WorldCupWPF
             var teamDetailsWindow = new TeamDetailsWindow(results);
             teamDetailsWindow.Show();
         }
+        private void DisplayLineups(List<Country.StartingEleven> homeTeam, List<Country.StartingEleven> awayTeam)
+        {
+            fieldCanvas.Children.Clear(); // Clear previous lineups
 
-        
+            double canvasWidth = fieldCanvas.ActualWidth;
+            double canvasHeight = fieldCanvas.ActualHeight;
+
+            // Define base positions as percentages of the canvas dimensions
+            var homePositions = new Dictionary<string, (double X, double Y)>
+    {
+        { "Goalie", (0.42 * canvasWidth, 0.03 * canvasHeight) },
+        { "Defender", (0.08 * canvasWidth, 0.18 * canvasHeight) },
+        { "Midfield", (0.5 * canvasWidth, 0.5 * canvasHeight) },
+        { "Forward", (0.7 * canvasWidth, 0.7 * canvasHeight) }
+    };
+
+            var awayPositions = new Dictionary<string, (double X, double Y)>
+    {
+        { "Goalie", (0.9 * canvasWidth, 0.5 * canvasHeight) },
+        { "Defender", (0.7 * canvasWidth, 0.3 * canvasHeight) },
+        { "Midfield", (0.5 * canvasWidth, 0.5 * canvasHeight) },
+        { "Forward", (0.3 * canvasWidth, 0.7 * canvasHeight) }
+    };
+
+            // Spacing for multiple players in the same position
+            const double spacing = 80;
+
+            // Render players
+            RenderPlayers(homeTeam, homePositions, spacing, isHomeTeam: true);
+            RenderPlayers(awayTeam, awayPositions, spacing, isHomeTeam: false);
+        }
+
+        private void RenderPlayers(List<Country.StartingEleven> players, Dictionary<string, (double X, double Y)> positions, double spacing, bool isHomeTeam)
+        {
+            var playerCountByPosition = new Dictionary<string, int>();
+
+            foreach (var player in players)
+            {
+                if (positions.TryGetValue(player.position, out var basePosition))
+                {
+                    if (!playerCountByPosition.ContainsKey(player.position))
+                        playerCountByPosition[player.position] = 0;
+
+                    // Calculate position with horizontal spacing for overlapping players
+                    var offset = playerCountByPosition[player.position] * spacing;
+                    var x = basePosition.X + offset; // Offset horizontally for multiple players
+                    var y = basePosition.Y; // Keep vertical position fixed
+
+                    // Create player control and position it
+                    var playerControl = new PlayerControl(player.name, player.shirt_number, "Images/PlayerIcon.png");
+                    Canvas.SetLeft(playerControl, x);
+                    Canvas.SetTop(playerControl, y);
+                    fieldCanvas.Children.Add(playerControl);
+
+                    playerCountByPosition[player.position]++;
+                }
+            }
+        }
+
+
     }
 }
