@@ -241,7 +241,7 @@ namespace WorldCupWPF
             }
         }
 
-         private async void TeamCB_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private async void TeamCB_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             matchResultTB.Text = "--";
             LoadOpponentTeams(); // Populate OpponentTeamCB based on the selected team
@@ -285,7 +285,10 @@ namespace WorldCupWPF
                     match.away_team_statistics?.starting_eleven != null)
                 {
                     // Display the starting lineups
-                    DisplayLineups(match.home_team_statistics.starting_eleven, match.away_team_statistics.starting_eleven);
+                    DisplayLineups(match.home_team_statistics?.starting_eleven,
+    match.home_team_statistics?.substitutes,
+    match.away_team_statistics?.starting_eleven,
+    match.away_team_statistics?.substitutes);
                 }
                 else
                 {
@@ -379,36 +382,46 @@ namespace WorldCupWPF
             var teamDetailsWindow = new TeamDetailsWindow(results);
             teamDetailsWindow.Show();
         }
-        private void DisplayLineups(List<Country.StartingEleven> homeTeam, List<Country.StartingEleven> awayTeam)
+        private void DisplayLineups(List<Country.StartingEleven> homeTeam,
+    List<Country.Substitute> homeSubstitutes,
+    List<Country.StartingEleven> awayTeam,
+    List<Country.Substitute> awaySubstitutes)
         {
+           
             fieldCanvas.Children.Clear(); // Clear previous lineups
+
+            HomeTeamLineup.Children.Clear(); // Clear home team lineup
+            AwayTeamLineup.Children.Clear(); // Clear away team lineup
 
             double canvasWidth = fieldCanvas.ActualWidth;
             double canvasHeight = fieldCanvas.ActualHeight;
+            
 
             // Define base positions as percentages of the canvas dimensions
             var homePositions = new Dictionary<string, (double X, double Y)>
     {
-        { "Goalie", (0.42 * canvasWidth, 0.03 * canvasHeight) },
-        { "Defender", (0.08 * canvasWidth, 0.18 * canvasHeight) },
-        { "Midfield", (0.5 * canvasWidth, 0.5 * canvasHeight) },
-        { "Forward", (0.7 * canvasWidth, 0.7 * canvasHeight) }
+        { "Goalie", (0.465 * canvasWidth, 0.03 * canvasHeight) },
+        { "Defender", (0.1 * canvasWidth, 0.18 * canvasHeight) },
+        { "Midfield", (0.1 * canvasWidth, 0.31 * canvasHeight) },
+        { "Forward", (0.35 * canvasWidth, 0.42 * canvasHeight) }
     };
 
             var awayPositions = new Dictionary<string, (double X, double Y)>
     {
-        { "Goalie", (0.9 * canvasWidth, 0.5 * canvasHeight) },
-        { "Defender", (0.7 * canvasWidth, 0.3 * canvasHeight) },
-        { "Midfield", (0.5 * canvasWidth, 0.5 * canvasHeight) },
-        { "Forward", (0.3 * canvasWidth, 0.7 * canvasHeight) }
+        { "Goalie", (0.465 * canvasWidth, 0.95 * canvasHeight) },
+        { "Defender", (0.1 * canvasWidth, 0.8 * canvasHeight) },
+        { "Midfield", (0.1 * canvasWidth, 0.66 * canvasHeight) },
+        { "Forward", (0.35 * canvasWidth, 0.55* canvasHeight) }
     };
 
             // Spacing for multiple players in the same position
-            const double spacing = 80;
+            const double spacing = 75;
 
             // Render players
             RenderPlayers(homeTeam, homePositions, spacing, isHomeTeam: true);
             RenderPlayers(awayTeam, awayPositions, spacing, isHomeTeam: false);
+            RenderLineup(HomeTeamLineup, homeTeam, homeSubstitutes, "Home Team");
+            RenderLineup(AwayTeamLineup, awayTeam, awaySubstitutes, "Away Team");
         }
 
         private void RenderPlayers(List<Country.StartingEleven> players, Dictionary<string, (double X, double Y)> positions, double spacing, bool isHomeTeam)
@@ -428,7 +441,7 @@ namespace WorldCupWPF
                     var y = basePosition.Y; // Keep vertical position fixed
 
                     // Create player control and position it
-                    var playerControl = new PlayerControl(player.name, player.shirt_number, "Images/PlayerIcon.png");
+                    var playerControl = new PlayerControl( player.shirt_number, "Images/PlayerIcon.png");
                     Canvas.SetLeft(playerControl, x);
                     Canvas.SetTop(playerControl, y);
                     fieldCanvas.Children.Add(playerControl);
@@ -438,6 +451,52 @@ namespace WorldCupWPF
             }
         }
 
+        private void RenderLineup(StackPanel lineupPanel, List<Country.StartingEleven> players, List<Country.Substitute> substitutes, string teamName)
+        {
+            // Display the team name
+            var teamHeader = new TextBlock
+            {
+                Text = $"{teamName} Lineup",
+                FontSize = 16,
+                FontWeight = FontWeights.Bold,
+                Margin = new Thickness(0, 0, 0, 10)
+            };
+            lineupPanel.Children.Add(teamHeader);
+
+            // Display starting players
+            foreach (var player in players)
+            {
+                var playerInfo = new TextBlock
+                {
+                    Text = $"{player.name} ({player.shirt_number})",
+                    FontSize = 14,
+                    Margin = new Thickness(0, 5, 0, 5)
+                };
+                lineupPanel.Children.Add(playerInfo);
+            }
+
+            // Add a separator
+            var separator = new TextBlock
+            {
+                Text = "Substitutes",
+                FontSize = 14,
+                FontWeight = FontWeights.Bold,
+                Margin = new Thickness(0, 10, 0, 5)
+            };
+            lineupPanel.Children.Add(separator);
+
+            // Display substitutes
+            foreach (var substitute in substitutes)
+            {
+                var substituteInfo = new TextBlock
+                {
+                    Text = $"{substitute.name} ({substitute.shirt_number})",
+                    FontSize = 14,
+                    Margin = new Thickness(0, 5, 0, 5)
+                };
+                lineupPanel.Children.Add(substituteInfo);
+            }
+        }
 
     }
 }

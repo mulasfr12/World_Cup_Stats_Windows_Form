@@ -20,16 +20,14 @@ namespace WorldCupWPF
     /// </summary>
     public partial class PlayerControl : UserControl
     {
-        public PlayerControl(string name, int shirtNumber, string imageUri)
+        public PlayerControl( int shirtNumber, string imageUri)
         {
             InitializeComponent();
-            DataContext = this;
-            Name = name;
+            DataContext = this;  
             ShirtNumber = shirtNumber;
             Image = new BitmapImage(new Uri(imageUri, UriKind.RelativeOrAbsolute));
         }
 
-        public string Name { get; set; }
         public int ShirtNumber { get; set; }
         public ImageSource Image { get; set; }
     }
