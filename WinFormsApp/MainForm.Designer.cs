@@ -31,7 +31,7 @@ namespace WinFormsApp
         private void InitializeComponent()
         {
             this.cbFavoriteTeam = new System.Windows.Forms.ComboBox();
-            this.label1 = new System.Windows.Forms.Label();
+            this.lblSelectTeam = new System.Windows.Forms.Label();
             this.btnSaveFavorite = new System.Windows.Forms.Button();
             this.flowPanelFavorites = new System.Windows.Forms.FlowLayoutPanel();
             this.flowPanelOthers = new System.Windows.Forms.FlowLayoutPanel();
@@ -51,6 +51,7 @@ namespace WinFormsApp
             this.PrintRankings = new System.Windows.Forms.Button();
             this.ExportPlayerRanking = new System.Windows.Forms.Button();
             this.btnChangeSettings = new System.Windows.Forms.Button();
+            this.loadingPanel = new System.Windows.Forms.Panel();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewPlayerRankings)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewMatchRankings)).BeginInit();
             this.SuspendLayout();
@@ -63,14 +64,15 @@ namespace WinFormsApp
             this.cbFavoriteTeam.Size = new System.Drawing.Size(286, 24);
             this.cbFavoriteTeam.TabIndex = 0;
             // 
-            // label1
+            // lblSelectTeam
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(12, 36);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(166, 16);
-            this.label1.TabIndex = 1;
-            this.label1.Text = "Select your Favourite team";
+            this.lblSelectTeam.AccessibleName = "";
+            this.lblSelectTeam.AutoSize = true;
+            this.lblSelectTeam.Location = new System.Drawing.Point(12, 36);
+            this.lblSelectTeam.Name = "lblSelectTeam";
+            this.lblSelectTeam.Size = new System.Drawing.Size(166, 16);
+            this.lblSelectTeam.TabIndex = 1;
+            this.lblSelectTeam.Text = "Select your Favourite team";
             // 
             // btnSaveFavorite
             // 
@@ -245,7 +247,7 @@ namespace WinFormsApp
             // 
             // btnChangeSettings
             // 
-            this.btnChangeSettings.Location = new System.Drawing.Point(1295, 37);
+            this.btnChangeSettings.Location = new System.Drawing.Point(1253, 34);
             this.btnChangeSettings.Name = "btnChangeSettings";
             this.btnChangeSettings.Size = new System.Drawing.Size(146, 27);
             this.btnChangeSettings.TabIndex = 11;
@@ -253,11 +255,21 @@ namespace WinFormsApp
             this.btnChangeSettings.UseVisualStyleBackColor = true;
             this.btnChangeSettings.Click += new System.EventHandler(this.btnChangeSettings_Click);
             // 
+            // loadingPanel
+            // 
+            this.loadingPanel.BackColor = System.Drawing.Color.Lime;
+            this.loadingPanel.Location = new System.Drawing.Point(1405, 36);
+            this.loadingPanel.Name = "loadingPanel";
+            this.loadingPanel.Size = new System.Drawing.Size(148, 25);
+            this.loadingPanel.TabIndex = 12;
+            this.loadingPanel.Visible = false;
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1565, 799);
+            this.Controls.Add(this.loadingPanel);
             this.Controls.Add(this.btnChangeSettings);
             this.Controls.Add(this.ExportPlayerRanking);
             this.Controls.Add(this.PrintRankings);
@@ -268,7 +280,7 @@ namespace WinFormsApp
             this.Controls.Add(this.flowPanelOthers);
             this.Controls.Add(this.flowPanelFavorites);
             this.Controls.Add(this.btnSaveFavorite);
-            this.Controls.Add(this.label1);
+            this.Controls.Add(this.lblSelectTeam);
             this.Controls.Add(this.cbFavoriteTeam);
             this.KeyPreview = true;
             this.Name = "MainForm";
@@ -285,7 +297,7 @@ namespace WinFormsApp
         #endregion
 
         private System.Windows.Forms.ComboBox cbFavoriteTeam;
-        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label lblSelectTeam;
         private System.Windows.Forms.Button btnSaveFavorite;
         private System.Windows.Forms.FlowLayoutPanel flowPanelFavorites;
         private System.Windows.Forms.FlowLayoutPanel flowPanelOthers;
@@ -311,6 +323,7 @@ namespace WinFormsApp
         private Button PrintRankings;
         private Button ExportPlayerRanking;
         private Button btnChangeSettings;
+        private Panel loadingPanel;
     }
 }
 

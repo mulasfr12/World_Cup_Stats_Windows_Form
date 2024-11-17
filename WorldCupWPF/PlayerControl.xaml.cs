@@ -42,7 +42,7 @@ namespace WorldCupWPF
         private void PlayerControl_MouseDown(object sender, MouseButtonEventArgs e)
         {
             // Handle player control click event here
-            MessageBox.Show($"Player clicked! Shirt Number: {ShirtNumber}");
+            
         }
     }
 }

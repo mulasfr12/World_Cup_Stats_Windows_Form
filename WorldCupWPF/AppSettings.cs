@@ -31,7 +31,6 @@ namespace WorldCupWPF
             var settingsData = $"{settings.Gender};{settings.Language};{settings.DataSource}";
             File.WriteAllText("settings.txt", settingsData);
         }
-
     }
 }
  

@@ -14,6 +14,7 @@ using System.Windows.Forms;
 using WinFormsApp.Properties;
 using static DataLayer.Models.Country;
 using System.Drawing.Printing;
+using System.Reflection.Emit;
 
 namespace WinFormsApp
 {
@@ -23,6 +24,7 @@ namespace WinFormsApp
         private string _language;
         private string _dataSource;
         private DataService _dataService;
+       
 
         public MainForm(string gender, string language, string dataSource)
         {
@@ -43,31 +45,27 @@ namespace WinFormsApp
         {
             try
             {
-                // Apply the gender-specific endpoint based on the saved selection
                 string endpoint = (_gender == "Male")
-                    ? "teams/results" // Men’s endpoint for teams or matches
-                    : "teams/results"; // Women’s endpoint for teams or matches
+                    ? "teams/results" 
+                    : "teams/results"; 
 
-                // Apply language localization
                 ApplyLanguage(_language);
 
-                // Fetch and display data based on the data source (API or JSON)
                 FetchData(endpoint,_gender);
-
-                // Show a confirmation message
+               
                 MessageBox.Show("Settings applied successfully.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"Error applying settings: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
+            }           
         }
 
         public async Task<List<Team>> FetchData(string endpoint, string gender)
         {
             if (_dataService != null)
             {
-                // Pass in gender-specific endpoint or determine if fetching via API/JSON.
+                //Passing in gender-specific endpoint or determine if fetching via API/JSON.
                 bool isMen = gender.ToLower() == "male";
                 return await _dataService.GetTeamsData(endpoint, isMen);
             }
@@ -78,39 +76,30 @@ namespace WinFormsApp
         {
             try
             {
-                // Determine if data should be fetched from the API or JSON based on the existing DataService
                 bool isMen = gender.ToLower() == "male";
                 string endpointOrPath = "";
 
-                // Set the appropriate endpoint or JSON path based on the gender and data source
                 if (_dataService != null)
                 {
                     if (_dataSource == "API")
                     {
-                        // Use API endpoint based on gender selection
                         endpointOrPath = isMen
                             ? "https://worldcup-vua.nullbit.hr/men/teams/results"
                             : "https://worldcup-vua.nullbit.hr/women/teams/results";
                     }
                     else
                     {
-                        // Use JSON file path based on gender selection
                         endpointOrPath = isMen
                             ? Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "JsonFiles", "Men", "teams.json")
                             : Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "JsonFiles", "Women", "teams.json");
                     }
                 }
 
-                // Fetch teams using the DataService instance
                 List<Team> teams = await _dataService.GetTeamsData(endpointOrPath, isMen);
-
-                // Clear the ComboBox items to avoid duplication
                 cbFavoriteTeam.Items.Clear();
 
-                // Check if teams were successfully fetched
                 if (teams != null && teams.Count > 0)
                 {
-                    // Load teams into ComboBox in the format "NAME (FIFA_CODE)"
                     foreach (var team in teams)
                     {
                         cbFavoriteTeam.Items.Add($"{team.Country} ({team.Fifa_Code})");
@@ -156,41 +145,53 @@ namespace WinFormsApp
             {
                 MessageBox.Show($"Error applying language: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+            if(language == "hr")
+            {
+                lblSelectTeam.Text = "Odeberite omiljeni tim";
+                btnSaveFavorite.Text = "Ustedjeti";
+                btnShowRankings.Text = "Pokazati poredak igraca";
+                PrintRankings.Text = "Poredak ispisa";
+                ExportPlayerRanking.Text = "Izvezi rangiranje u pdf";
+                btnChangeSettings.Text = "Promijeniti postavke";
+                btnShowMatchRankings.Text = "Pokazati poredak utakmica";
+                FullName.HeaderText = "Ime graca";
+                Goals.HeaderText = "Ciljevi";
+                YellowCards.HeaderText = "Zuti kartoni";
+                Appearances.HeaderText = "Pojave";
+                PlayerPicture.HeaderText = "Silka igraca";
+
+                Locatison.HeaderText = "Mjesto";
+                Attendance.HeaderText = "Pohadanje";
+                HostTeam.HeaderText = "Ekipa domacina";
+                GuestTeam.HeaderText = "Gostujuca ekipa";
+
+            }
         }
 
         private async void LoadPlayers(string gender, string dataSource, string favoriteTeam)
         {
             try
             {
-                // Determine if data should be fetched from the API or JSON based on the existing DataService
                 bool isMen = gender.ToLower() == "male";
                 string endpoint = "";
 
-                // Set the appropriate endpoint or JSON path based on the gender and data source
                 if (_dataService != null)
                 {
                     if (_dataSource == "API")
                     {
-                        // Use API endpoint based on gender selection
                         endpoint = isMen
                             ? "https://worldcup-vua.nullbit.hr/men/matches"
                             : "https://worldcup-vua.nullbit.hr/women/matches";
                     }
                     else
                     {
-                        // Use JSON file path based on gender selection
                         endpoint = isMen
                             ? Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "JsonFiles", "Men", "matches.json")
                             : Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "JsonFiles", "Women", "matches.json");
                     }
                 }
-
-                // Fetch matches data
                 var matches = await _dataService.GetMatchesData(endpoint, gender == "Male");
-               // var matches = await _dataService.GetMatchesDataForCountry(favoriteTeam, isMen);
-
-
-                // Ensure data was fetched
+              
                 if (matches == null || !matches.Any())
                 {
                     MessageBox.Show("No matches were fetched from the data source.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -211,29 +212,25 @@ namespace WinFormsApp
                     return;
                 }
                 
-                // Filter players only from the favorite team
                 var players = new List<object>(); // Using object to accommodate different player types
                 if (firstMatch.home_team_statistics.country.Equals(favoriteTeamName, StringComparison.OrdinalIgnoreCase))
                 {
-                    // Load players from the home team
+                    // Loading players from the home team
                     players.AddRange(firstMatch.home_team_statistics.starting_eleven);
                     players.AddRange(firstMatch.home_team_statistics.substitutes);
                 }
                 else if (firstMatch.away_team_statistics.country.Equals(favoriteTeamName, StringComparison.OrdinalIgnoreCase))
                 {
-                    // Load players from the away team
+                    // Loading players from the away team
                     players.AddRange(firstMatch.away_team_statistics.starting_eleven);
                     players.AddRange(firstMatch.away_team_statistics.substitutes);
                 }
 
-                // If no players found for the favorite team
                 if (!players.Any())
                 {
                     MessageBox.Show("No players found for the selected team.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
-
-                // Load the players into the UI panels
                 LoadPlayersIntoPanels(players);
             }
             catch (Exception ex)
@@ -247,8 +244,7 @@ namespace WinFormsApp
         {
             flowPanelFavorites.Controls.Clear();
             flowPanelOthers.Controls.Clear();
-
-            // Load previously saved favorite players
+  
             var favoritePlayers = LoadFavoritePlayers();
 
             foreach (var player in players)
@@ -274,14 +270,14 @@ namespace WinFormsApp
                 {
                     playerControl.IsFavorite = true;
                     playerControl.UpdateFavoriteStatus(true);
-                    flowPanelFavorites.Controls.Add(playerControl);  // Use flowPanelFavorites
-                    Console.WriteLine($"Added favorite player: {playerControl.Player.name}");
+                    flowPanelFavorites.Controls.Add(playerControl); 
+                    
                 }
                 else
                 {
                     playerControl.UpdateFavoriteStatus(false);
-                    flowPanelOthers.Controls.Add(playerControl);  // Use flowPanelOthers
-                    Console.WriteLine($"Added other player: {playerControl.Player.name}");
+                    flowPanelOthers.Controls.Add(playerControl);
+                    
                 }
 
                 // Attach drag-and-drop event handlers
@@ -294,13 +290,11 @@ namespace WinFormsApp
         }
 
         private void PlayerControl_MouseDown(object sender, MouseEventArgs e)
-        {
-            // Ensure left mouse button is pressed to start drag
+        {          
             if (e.Button == MouseButtons.Left)
             {
                 PlayerControl playerControl = sender as PlayerControl;
 
-                // Begin dragging the control
                 if (playerControl != null)
                 {
                     DoDragDrop(playerControl, DragDropEffects.Move);
@@ -331,7 +325,7 @@ namespace WinFormsApp
             {
                 // Update favorite status and add to favorites panel
                 control.IsFavorite = true;
-                control.UpdateFavoriteStatus(true); // Ensure the star is shown
+                control.UpdateFavoriteStatus(true); 
                 flowPanelFavorites.Controls.Add(control);
                 SaveFavoritePlayers();
             }
@@ -353,7 +347,6 @@ namespace WinFormsApp
                 SaveFavoritePlayers();
             }
         }
-
 
         private ContextMenuStrip CreateContextMenu(PlayerControl playerControl)
         {
@@ -381,32 +374,18 @@ namespace WinFormsApp
 
         private void SaveFavoritePlayers()
         {
-            // Create a list to hold the favorite players' names
             List<string> favoritePlayerNames = new List<string>();
 
-            // Loop through the controls in the flowPanelFavorites (assuming it holds PlayerControl instances)
             foreach (Control control in flowPanelFavorites.Controls)
             {
                 if (control is PlayerControl playerControl)
-                {
-                    // Add the player's name to the list
+                {               
                     favoritePlayerNames.Add(playerControl.Player.name);
                 }
             }
-            // Write the player names to a text file
             File.WriteAllLines("favorite_players.txt", favoritePlayerNames);
         }
 
-
-        //private void MarkAsFavorite(PlayerControl playerControl)
-        //{
-        //    // Set the player as a favorite
-        //    playerControl.UpdateFavoriteStatus(true);
-
-        //    // Add logic to move the player control to the favorite panel if necessary
-        //    panelFavorites.Controls.Add(playerControl);
-        //    panelOthers.Controls.Remove(playerControl);
-        //}
         private List<string> LoadFavoritePlayers()
         {
             // Check if the file exists
@@ -418,7 +397,6 @@ namespace WinFormsApp
 
             return new List<string>(); // Return an empty list if the file does not exist
         }
-
 
         private void ApplyResource()
         {
@@ -433,7 +411,7 @@ namespace WinFormsApp
             }
         }
 
-        private void btnSaveFavorite_Click(object sender, EventArgs e)
+         private void btnSaveFavorite_Click(object sender, EventArgs e)
         {
             string selectedTeam = cbFavoriteTeam.SelectedItem.ToString();
             try
@@ -454,6 +432,7 @@ namespace WinFormsApp
             }
             LoadPlayers(_gender, _dataSource, selectedTeam);
         }
+
         private void SaveFavoriteTeam(string team)
         {
             try
@@ -486,93 +465,102 @@ namespace WinFormsApp
 
         private async void btnShowRankings_Click(object sender, EventArgs e)
         {
-            // Clear the current DataGridView rows to refresh the rankings
             dataGridViewPlayerRankings.Rows.Clear();
 
-            // Get the data for the favorite team stored previously (e.g., from a text file or settings)
-            var favoriteTeamCode = LoadFavoriteTeam(); // Assumes FIFA code is stored
-            MessageBox.Show($"Favorite Team FIFA Code: {favoriteTeamCode}"); // Check if the correct code is loaded
-            // Get the match data (either from JSON or API) based on the favorite team
-            var matches = await _dataService.GetMatchesData("https://worldcup-vua.nullbit.hr/men/matches", true); // Await the asynchronous c
+            bool isMen = _gender.ToLower() == "male";
+            string endpoint = "";
 
-            var filteredMatches = matches.Where(match =>
-            favoriteTeamCode.Contains(match.home_team_country) || favoriteTeamCode.Contains(match.away_team_country) ).ToList();
-
-            if (filteredMatches.Count == 0)
+            if (_dataService != null)
             {
-                MessageBox.Show("No matches found for the favorite team.");
-                return;
+                if (_dataSource == "API")
+                {
+                    endpoint = isMen
+                        ? "https://worldcup-vua.nullbit.hr/men/matches"
+                        : "https://worldcup-vua.nullbit.hr/women/matches";
+                }
+                else
+                {
+                    endpoint = isMen
+                        ? Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "JsonFiles", "Men", "matches.json")
+                        : Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "JsonFiles", "Women", "matches.json");
+                }
             }
 
-            MessageBox.Show($"Total Matches for Favorite Team: {filteredMatches.Count}");
-            // Calculate the player stats based on the match data
-            var playerStats = CalculatePlayerStats(filteredMatches);
+            var favoriteTeamCode = LoadFavoriteTeam(); 
+            MessageBox.Show($"Favorite Team FIFA Code: {favoriteTeamCode}"); 
 
-            // Sort players based on goals, then by yellow cards (descending order)
-            var sortedPlayerStats = playerStats
-                .OrderByDescending(p => p.Goals)
-                .ThenByDescending(p => p.YellowCards)
-                .ToList();
-
-            if (sortedPlayerStats.Count == 0)
+            try
             {
-                MessageBox.Show("No player stats available for the selected team.");
-                return;
+                var matches = await _dataService.GetMatchesData(endpoint, _gender.Equals("Male", StringComparison.OrdinalIgnoreCase));
+
+                var filteredMatches = matches.Where(match =>
+                    favoriteTeamCode.Contains(match.home_team_country) || favoriteTeamCode.Contains(match.away_team_country)).ToList();
+
+                if (filteredMatches.Count == 0)
+                {
+                    MessageBox.Show("No matches found for the favorite team.");
+                    return;
+                }
+
+                var playerStats = CalculatePlayerStats(filteredMatches);
+
+                var sortedPlayerStats = playerStats
+                    .OrderByDescending(p => p.Goals)
+                    .ThenByDescending(p => p.YellowCards)
+                    .ToList();
+
+                if (sortedPlayerStats.Count == 0)
+                {
+                    MessageBox.Show("No player stats available for the selected team.");
+                    return;
+                }
+
+                foreach (var player in sortedPlayerStats)
+                {
+                    var playerPicture = Resources.defaultPlayer; 
+
+                    dataGridViewPlayerRankings.Rows.Add(player.FullName, player.Goals, player.YellowCards, player.Appearances, playerPicture);
+                }
             }
-
-            // Add sorted players to the DataGridView
-            foreach (var player in sortedPlayerStats)
+            catch (Exception ex)
             {
-                var playerPicture = Resources.defaultPlayer; // Use default image if picture is null
-
-                dataGridViewPlayerRankings.Rows.Add(player.FullName, player.Goals, player.YellowCards, player.Appearances, playerPicture);
+                MessageBox.Show($"Error fetching player rankings: {ex.Message}");
             }
         }
-        
-
         private List<PlayerStats> CalculatePlayerStats(List<Country.Root> matches)
         {
             var playerStatsDict = new Dictionary<string, PlayerStats>(); // Dictionary to accumulate player stats
 
             foreach (var match in matches)
             {
-                // Process the home team players
                 var homeTeam = match.home_team_statistics;
                 if (homeTeam != null)
                 {
                     ProcessTeamPlayers(homeTeam.starting_eleven, homeTeam.substitutes, playerStatsDict);
                 }
 
-                // Process the away team players
                 var awayTeam = match.away_team_statistics;
                 if (awayTeam != null)
                 {
                     ProcessTeamPlayers(awayTeam.starting_eleven, awayTeam.substitutes, playerStatsDict);
                 }
 
-                // Process home team match events
                 ProcessHomeTeamEvents(match.home_team_events, playerStatsDict);
 
-                // Process away team match events
                 ProcessAwayTeamEvents(match.away_team_events, playerStatsDict);
-            }
-            // Debugging: Check if playerStatsDict has any players
+            }    
             if (playerStatsDict.Count == 0)
             {
                 MessageBox.Show("No player statistics found.");
             }
-            // Return the list of PlayerStats accumulated
             return playerStatsDict.Values.ToList();
         }
-
         private void ProcessHomeTeamEvents(List<Country.HomeTeamEvent> homeTeamEvents, Dictionary<string, PlayerStats> playerStatsDict)
         {
             foreach (var teamEvent in homeTeamEvents)
-            {
-                // Process goals and yellow cards for home team events
+            {           
                 if (teamEvent.type_of_event == "goal" || teamEvent.type_of_event == "goal-penalty")
                 {
-                    // Increment goals for the player if they exist in the dictionary
                     if (playerStatsDict.TryGetValue(teamEvent.player, out var playerStats))
                     {
                         playerStats.Goals++;
@@ -580,7 +568,6 @@ namespace WinFormsApp
                 }
                 else if (teamEvent.type_of_event == "yellow-card")
                 {
-                    // Increment yellow cards for the player if they exist in the dictionary
                     if (playerStatsDict.TryGetValue(teamEvent.player, out var playerStats))
                     {
                         playerStats.YellowCards++;
@@ -593,10 +580,8 @@ namespace WinFormsApp
         {
             foreach (var teamEvent in awayTeamEvents)
             {
-                // Process goals and yellow cards for away team events
                 if (teamEvent.type_of_event == "goal" || teamEvent.type_of_event == "goal-penalty")
                 {
-                    // Increment goals for the player if they exist in the dictionary
                     if (playerStatsDict.TryGetValue(teamEvent.player, out var playerStats))
                     {
                         playerStats.Goals++;
@@ -604,7 +589,6 @@ namespace WinFormsApp
                 }
                 else if (teamEvent.type_of_event == "yellow-card")
                 {
-                    // Increment yellow cards for the player if they exist in the dictionary
                     if (playerStatsDict.TryGetValue(teamEvent.player, out var playerStats))
                     {
                         playerStats.YellowCards++;
@@ -612,6 +596,7 @@ namespace WinFormsApp
                 }
             }
         }
+   
         private void ProcessTeamPlayers(List<Country.StartingEleven> startingEleven, List<Country.Substitute> substitutes, Dictionary<string, PlayerStats> playerStatsDict)
         {
             foreach (var player in startingEleven)
@@ -623,64 +608,81 @@ namespace WinFormsApp
             {
                 UpdatePlayerStats(player, playerStatsDict);
             }
+            if (startingEleven == null || !startingEleven.Any())
+            {
+                MessageBox.Show("No starting players found for the selected team.");
+            }
+            if (substitutes == null || !substitutes.Any())
+            {
+                MessageBox.Show("No substitutes found for the selected team.");
+            }
         }
+
         private void UpdatePlayerStats(dynamic player, Dictionary<string, PlayerStats> playerStatsDict)
         {
-            // If the player already exists in the dictionary, update their stats
-            if (!playerStatsDict.TryGetValue(player.name, out PlayerStats playerStats)) // Explicitly define the type
+            if (!playerStatsDict.TryGetValue(player.name, out PlayerStats playerStats))
             {
                 playerStats = new PlayerStats { FullName = player.name, Appearances = 0, Goals = 0, YellowCards = 0 };
                 playerStatsDict[player.name] = playerStats;
             }
 
-            // Increment appearances
             playerStats.Appearances++;
-        }      
-        //private Image GetPlayerImage(string playerName)
-        //{
-        //    // You can modify this to load from your stored images
-        //    var imagePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "PlayerImages", $"{playerName}.jpg");
-        //    if (File.Exists(imagePath))
-        //        return Image.FromFile(imagePath);
-
-        //    return Properties.Resources.defaultPlayer; // Use a default image if none found
-        //}
+        }
 
         private async void btnShowMatchRankings_Click(object sender, EventArgs e)
         {
-            // Clear the current DataGridView rows to refresh the rankings
             dataGridViewMatchRankings.Rows.Clear();
 
-            // Fetch matches for the selected team (either from JSON or API)
-            var favoriteTeamCode = LoadFavoriteTeam(); // Load favorite team FIFA code
-         
-            var matches = await _dataService.GetMatchesData("https://worldcup-vua.nullbit.hr/men/matches", true); // Await the asynchronous c
+            bool isMen =_gender.ToLower() == "male";
+            string endpoint = "";
 
-            var filteredMatches = matches.Where(match =>
-            favoriteTeamCode.Contains(match.home_team_country) || favoriteTeamCode.Contains(match.away_team_country)).ToList();
-
-            if (filteredMatches.Count == 0)
+            if (_dataService != null)
             {
-                MessageBox.Show("No matches found for the favorite team.");
-                return;
+                if (_dataSource == "API")
+                {
+                    endpoint = isMen
+                        ? "https://worldcup-vua.nullbit.hr/men/matches"
+                        : "https://worldcup-vua.nullbit.hr/women/matches";
+                }
+                else
+                {
+                    endpoint = isMen
+                        ? Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "JsonFiles", "Men", "matches.json")
+                        : Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "JsonFiles", "Women", "matches.json");
+                }
             }
 
-            MessageBox.Show($"Total Matches for Favorite Team: {filteredMatches.Count}");
+            var favoriteTeamCode = LoadFavoriteTeam(); 
 
-            // Calculate the player stats based on the match data
-            var playerStats = CalculatePlayerStats(filteredMatches);
-            // Calculate match stats
-            var matchStats = CalculateMatchStats(matches);
-
-            // Sort matches by the number of visitors (attendance) in descending order
-            var sortedMatchStats = matchStats.OrderByDescending(m => m.NumberOfVisitors).ToList();
-
-            // Add sorted matches to the DataGridView
-            foreach (var match in sortedMatchStats)
+            try
             {
-                dataGridViewMatchRankings.Rows.Add(match.Location, match.NumberOfVisitors, match.HostTeam, match.GuestTeam);
+                var matches = await _dataService.GetMatchesData(endpoint, _gender.Equals("Male", StringComparison.OrdinalIgnoreCase));
+
+                var filteredMatches = matches.Where(match =>
+                    favoriteTeamCode.Contains(match.home_team_country) || favoriteTeamCode.Contains(match.away_team_country)).ToList();
+
+                if (filteredMatches.Count == 0)
+                {
+                    MessageBox.Show("No matches found for the favorite team.");
+                    return;
+                }
+
+                var matchStats = CalculateMatchStats(filteredMatches);
+
+                // Sort matches by the number of visitors (attendance) in descending order
+                var sortedMatchStats = matchStats.OrderByDescending(m => m.NumberOfVisitors).ToList();
+
+                foreach (var match in sortedMatchStats)
+                {
+                    dataGridViewMatchRankings.Rows.Add(match.Location, match.NumberOfVisitors, match.HostTeam, match.GuestTeam);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error fetching match rankings: {ex.Message}");
             }
         }
+
         private List<MatchStats> CalculateMatchStats(List<Country.Root> matches)
         {
             var matchStatsList = new List<MatchStats>();
@@ -690,7 +692,7 @@ namespace WinFormsApp
                 // Create a new MatchStats object for each match
                 var matchStats = new MatchStats
                 {
-                    FifaId = match.fifa_id, // Assuming there's a 'fifa_id' property
+                    FifaId = match.fifa_id, 
                     Location = match.location,
                     NumberOfVisitors = match.attendance,
                     HostTeam = match.home_team_country,
@@ -700,12 +702,10 @@ namespace WinFormsApp
                 matchStatsList.Add(matchStats);
             }
 
-            // Return the list of MatchStats
             return matchStatsList;
         }
         private void ExportRankingsToPdf()
         {
-            // Define the PDF document
             Document document = new Document();
             string path = "RankingsReport.pdf";
 
@@ -783,8 +783,7 @@ namespace WinFormsApp
                 MessageBox.Show("Error creating PDF: " + ex.Message);
             }
             finally
-            {
-                // Close the document
+            {      
                 document.Close();
             }
 
@@ -806,60 +805,66 @@ namespace WinFormsApp
                 printDoc.Print();
             }
         }
+        private int playerRowIndex = 0;
+        private int matchRowIndex = 0;
+        private bool printingPlayers = true;
 
         private void PrintPageEvent(object sender, PrintPageEventArgs e)
         {
-            // Fonts for printing
+            // Fonts
             System.Drawing.Font headerFont = new System.Drawing.Font("Arial", 14, FontStyle.Bold);
             System.Drawing.Font bodyFont = new System.Drawing.Font("Arial", 10);
 
-            // Starting coordinates for printing
-            int yPos = 100;
-            int margin = 50; // Margin between sections
+            // Margins and starting position
+            int yPos = e.MarginBounds.Top;
+            int margin = 50;
 
-            // Print Player Rankings Header
-            e.Graphics.DrawString("Player Rankings", headerFont, Brushes.Black, new Point(100, yPos));
+            // Handle Player Rankings
+            if (printingPlayers)
+            {
+                yPos = PrintSection(e, "Player Rankings", dataGridViewPlayerRankings, ref playerRowIndex, headerFont, bodyFont, yPos, margin);
+
+                // If there's more content, return for next page
+                if (e.HasMorePages) return;
+
+                // Switch to Match Rankings
+                printingPlayers = false;
+            }
+
+            // Handle Match Rankings
+            yPos = PrintSection(e, "Match Rankings", dataGridViewMatchRankings, ref matchRowIndex, headerFont, bodyFont, yPos, margin);
+
+            // Mark the end of printing if all rows are done
+            e.HasMorePages = matchRowIndex < dataGridViewMatchRankings.Rows.Count;
+        }
+
+        private int PrintSection(PrintPageEventArgs e, string title, DataGridView dataGridView, ref int rowIndex, System.Drawing.Font headerFont, System.Drawing.Font bodyFont, int yPos, int margin)
+        {
+            // Print section title
+            e.Graphics.DrawString(title, headerFont, Brushes.Black, new Point(e.MarginBounds.Left, yPos));
             yPos += margin;
 
-            // Loop through DataGridView rows and print player rankings
-            foreach (DataGridViewRow row in dataGridViewPlayerRankings.Rows)
+            // Print rows
+            for (; rowIndex < dataGridView.Rows.Count; rowIndex++)
             {
+                var row = dataGridView.Rows[rowIndex];
                 if (!row.IsNewRow)
                 {
-                    string playerText = $"{row.Cells[0].Value} - Goals: {row.Cells[1].Value}, Yellow Cards: {row.Cells[2].Value}, Appearances: {row.Cells[3].Value}";
-                    e.Graphics.DrawString(playerText, bodyFont, Brushes.Black, new Point(100, yPos));
+                    string text = string.Join(", ", row.Cells.Cast<DataGridViewCell>().Select(c => c.Value?.ToString() ?? ""));
+                    e.Graphics.DrawString(text, bodyFont, Brushes.Black, new Point(e.MarginBounds.Left, yPos));
                     yPos += 30;
+
+                    // Check if we've reached the page bottom
+                    if (yPos > e.MarginBounds.Bottom)
+                    {
+                        e.HasMorePages = true;
+                        return yPos;
+                    }
                 }
             }
 
-            // Add some space between sections
-            yPos += margin;
-
-            // Print Match Rankings Header
-            e.Graphics.DrawString("Match Rankings", headerFont, Brushes.Black, new Point(100, yPos));
-            yPos += margin;
-
-            // Loop through DataGridView rows and print match rankings
-            foreach (DataGridViewRow row in dataGridViewMatchRankings.Rows) // Assuming a separate DataGridView for match rankings
-            {
-                if (!row.IsNewRow)
-                {
-                    string matchText = $"Location: {row.Cells[0].Value}, Visitors: {row.Cells[1].Value}, Home Team: {row.Cells[2].Value}, Away Team: {row.Cells[3].Value}";
-                    e.Graphics.DrawString(matchText, bodyFont, Brushes.Black, new Point(100, yPos));
-                    yPos += 30;
-                }
-            }
-
-            // Check if more pages are required (based on content length)
-            if (yPos > e.MarginBounds.Bottom)
-            {
-                e.HasMorePages = true;
-                yPos = 100; // Reset yPos for next page
-            }
-            else
-            {
-                e.HasMorePages = false;
-            }
+            e.HasMorePages = false;
+            return yPos;
         }
 
         private void PrintRankings_Click(object sender, EventArgs e)

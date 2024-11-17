@@ -46,7 +46,6 @@ namespace WorldCupWPF
         {
             _dataService = new DataService(_useApi);
         }
-
         private async void LoadTeams()
         {
             try
@@ -57,20 +56,19 @@ namespace WorldCupWPF
                                : "https://worldcup-vua.nullbit.hr/women/teams/results")
                     : string.Empty;
 
-                _teams = await _dataService.GetTeamsData(endpointOrPath, _isMen); // Store teams
+                _teams = await _dataService.GetTeamsData(endpointOrPath, _isMen); 
 
                 TeamCB.ItemsSource = _teams.Select(t => $"{t.Country} ({t.Fifa_Code})").ToList();
-                OpponentTeamCB.ItemsSource = null; // Don't populate OpponentTeamCB here
+                OpponentTeamCB.ItemsSource = null;
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"Error loading teams: {ex.Message}");
             }
         }
-
         private async void LoadOpponentTeams()
         {
-            // Choose the correct endpoint for matches based on gender
+            
             string endpointOrPath = _useApi
                 ? (_isMen ? "https://worldcup-vua.nullbit.hr/men/matches"
                           : "https://worldcup-vua.nullbit.hr/women/matches")
@@ -122,7 +120,6 @@ namespace WorldCupWPF
                 MessageBox.Show($"Error loading opponent teams: {ex.Message}");
             }
         }
-
         private async void DisplayMatchResult()
         {
             if (TeamCB.SelectedItem is string team1Text && OpponentTeamCB.SelectedItem is string team2Text)
@@ -132,7 +129,6 @@ namespace WorldCupWPF
 
                 try
                 {
-                    // Select the correct match endpoint based on gender
                     string endpointOrPath = _useApi
                         ? (_isMen ? "https://worldcup-vua.nullbit.hr/men/matches"
                                   : "https://worldcup-vua.nullbit.hr/women/matches")
@@ -146,7 +142,6 @@ namespace WorldCupWPF
                         return;
                     }
 
-                    // Find the match where team1 and team2 played against each other
                     var match = matches.FirstOrDefault(m =>
                         (m.home_team?.country?.Equals(team1Name, StringComparison.OrdinalIgnoreCase) == true &&
                          m.away_team?.country?.Equals(team2Name, StringComparison.OrdinalIgnoreCase) == true) ||
@@ -157,17 +152,14 @@ namespace WorldCupWPF
                     {
                         string result;
 
-                        // Determine if team1 is home or away in the found match
                         bool isTeam1Home = match.home_team?.country?.Equals(team1Name, StringComparison.OrdinalIgnoreCase) == true;
 
                         if (isTeam1Home)
                         {
-                            // team1 is the home team in the match
                             result = $"{match.home_team?.goals} : {match.away_team?.goals}";
                         }
                         else
                         {
-                            // team1 is the away team, so reverse the result
                             result = $"{match.away_team?.goals} : {match.home_team?.goals}";
                         }
 
@@ -184,16 +176,6 @@ namespace WorldCupWPF
                 }
             }
         }
-
-
-
-        //private async Task<string> GetMatchResult(string team1, string team2)
-        //{
-        //    // Implement logic to retrieve and return the match result based on your data layer
-        //    // For demonstration purposes, return a static result
-        //    return await Task.FromResult("2 : 1");
-        //}
-
         private void LoadSettings()
         {
             try
@@ -202,13 +184,10 @@ namespace WorldCupWPF
 
                 if (settings.Length == 3)
                 {
-                    // Read Gender setting
                     _isMen = settings[0].Trim().Equals("Male", StringComparison.OrdinalIgnoreCase);
 
-                    // Read Language setting
                     _language = settings[1].Trim().Equals("Croatian", StringComparison.OrdinalIgnoreCase) ? "hr" : "en";
 
-                    // Read DataSource setting
                     _useApi = settings[2].Trim().Equals("API", StringComparison.OrdinalIgnoreCase);
                 }
                 else
@@ -219,10 +198,10 @@ namespace WorldCupWPF
             catch (Exception ex)
             {
                 MessageBox.Show($"Error loading settings: {ex.Message}");
-                // Set defaults if loading fails
-                _isMen = true;       // Default to male teams
-                _language = "en";     // Default to English
-                _useApi = true;       // Default to API
+                
+                _isMen = true; 
+                _language = "en";     
+                _useApi = true;      
             }
             if(_language == "hr")
             {
@@ -238,18 +217,14 @@ namespace WorldCupWPF
         private async void TeamCB_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             matchResultTB.Text = "--";
-            LoadOpponentTeams(); // Populate OpponentTeamCB based on the selected team
+            LoadOpponentTeams(); 
             await UpdateLineups();
         }
-
         private async void OpponentTeamCB_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            // Display match result when opponent team is selected
             DisplayMatchResult();
             await UpdateLineups();
         }
-
-         
         private async Task UpdateLineups()
             {
                 if (!(TeamCB.SelectedItem is string homeTeamText) || !(OpponentTeamCB.SelectedItem is string awayTeamText))
@@ -298,61 +273,43 @@ namespace WorldCupWPF
                     MessageBox.Show("No match found for the selected teams.");
                 }
             }
-
         private async void TeamInfoButton_Click(object sender, RoutedEventArgs e)
         {
             if (TeamCB.SelectedItem is string selectedTeamText)
             {
                 var fifaCode = ExtractFifaCode(selectedTeamText);
-                MessageBox.Show($"Team Info button clicked. FIFA Code: {fifaCode}");
-
+              
                 // Show loading animation
                 ShowLoadingOverlay();
 
-                // Wait 0.5 seconds before continuing
                 await Task.Delay(500);
-
-                // Open Team Details after delay
+ 
                 ShowTeamInfo(fifaCode, _isMen);
-
-                // Hide loading animation
                 HideLoadingOverlay();
             }
         }
-
         private async void OpponentInfoButton_Click(object sender, RoutedEventArgs e)
         {
             if (OpponentTeamCB.SelectedItem is string selectedOpponentText)
             {
                 var fifaCode = ExtractFifaCode(selectedOpponentText);
 
-                // Show loading animation
                 ShowLoadingOverlay();
-
-                // Wait 0.5 seconds before continuing
                 await Task.Delay(500);
-
-                // Open Team Details after delay
                 ShowTeamInfo(fifaCode, _isMen);
-
-                // Hide loading animation
                 HideLoadingOverlay();
             }
         }
-
-        // Methods to show and hide the loading overlay
+        
         private void ShowLoadingOverlay()
         {
             LoadingOverlay.Visibility = Visibility.Visible;
         }
-
         private void HideLoadingOverlay()
         {
             LoadingOverlay.Visibility = Visibility.Collapsed;
         }
 
-
-        // Helper method to extract FIFA code from the combo box item
         private string ExtractFifaCode(string itemText)
         {
             var startIndex = itemText.IndexOf('(') + 1;
@@ -362,7 +319,6 @@ namespace WorldCupWPF
 
         private async void ShowTeamInfo(string fifaCode, bool isMen)
         {
-            // Choose the correct endpoint based on gender and data source
             string endpoint = _useApi
                 ? (isMen ? "https://worldcup-vua.nullbit.hr/men/teams/results"
                          : "https://worldcup-vua.nullbit.hr/women/teams/results")
@@ -385,14 +341,14 @@ namespace WorldCupWPF
          List<Country.StartingEleven> awayTeam,
          List<Country.Substitute> awaySubstitutes,
          List<Country.HomeTeamEvent> homeEvents,
-         List<Country.AwayTeamEvent> awayEvents)
+         List<Country.AwayTeamEvent> awayEvents
+            )
         {
-            fieldCanvas.Children.Clear(); // Clear previous lineups
+            fieldCanvas.Children.Clear();
 
             double canvasWidth = fieldCanvas.ActualWidth;
             double canvasHeight = fieldCanvas.ActualHeight;
 
-            // Define base positions as percentages of the canvas dimensions
             var homePositions = new Dictionary<string, (double X, double Y)>
             {
                 { "Goalie", (0.465 * canvasWidth, 0.03 * canvasHeight) },
@@ -411,7 +367,6 @@ namespace WorldCupWPF
 
             const double spacing = 75;
 
-            // Render players
             RenderPlayers(homeTeam, homePositions, spacing, true, homeEvents, awayEvents);
             RenderPlayers(awayTeam, awayPositions, spacing, false, homeEvents, awayEvents);
             RenderLineup(HomeTeamLineup, homeTeam, homeSubstitutes, "Home Team");
@@ -455,11 +410,8 @@ namespace WorldCupWPF
                 }
             }
         }
-
-
         private PlayerStats GetPlayerStats(Country.StartingEleven player, List<Country.HomeTeamEvent> homeEvents, List<Country.AwayTeamEvent> awayEvents)
         {
-            // Fetch stats from the match data (goals, yellow cards, etc.)
             return new PlayerStats
             {
                 FullName = player.name,
@@ -480,31 +432,24 @@ namespace WorldCupWPF
 
         private void ShowPlayerDetails(Country.StartingEleven player, PlayerStats stats)
         {
-            // Close the existing window if it's open
             if (_playerDetailsWindow != null)
             {
                 _playerDetailsWindow.Close();
                 _playerDetailsWindow = null;
             }
 
-            // Create and show a new player details window
             _playerDetailsWindow = new PlayerDetailsWindow(player, stats);
 
-            // Add animation for window appearance
             var animation = new System.Windows.Media.Animation.DoubleAnimation(0, 1, new Duration(TimeSpan.FromSeconds(0.3)));
             _playerDetailsWindow.BeginAnimation(UIElement.OpacityProperty, animation);
 
             _playerDetailsWindow.Show();
         }
-        private void PlayerDetailsWindow_Closed(object sender, EventArgs e)
-        {
-            _playerDetailsWindow = null;
-        }
-
-
+       
         private void RenderLineup(StackPanel lineupPanel, List<Country.StartingEleven> players, List<Country.Substitute> substitutes, string teamName)
         {
-            // Display the team name
+            lineupPanel.Children.Clear();
+            
             var teamHeader = new TextBlock
             {
                 Text = $"{teamName} Lineup",
@@ -513,8 +458,7 @@ namespace WorldCupWPF
                 Margin = new Thickness(0, 0, 0, 10)
             };
             lineupPanel.Children.Add(teamHeader);
-
-            // Display starting players
+ 
             foreach (var player in players)
             {
                 var playerInfo = new TextBlock
@@ -525,8 +469,7 @@ namespace WorldCupWPF
                 };
                 lineupPanel.Children.Add(playerInfo);
             }
-
-            // Add a separator
+         
             var separator = new TextBlock
             {
                 Text = "Substitutes",
@@ -536,7 +479,6 @@ namespace WorldCupWPF
             };
             lineupPanel.Children.Add(separator);
 
-            // Display substitutes
             foreach (var substitute in substitutes)
             {
                 var substituteInfo = new TextBlock
@@ -552,26 +494,11 @@ namespace WorldCupWPF
         private void SettingsButton_Click(object sender, RoutedEventArgs e)
         {
             var settingsWindow = new SettingsWindow();
-            if (settingsWindow.ShowDialog() == true) // Check for confirmation
+            if (settingsWindow.ShowDialog() == true) 
             {
                 MessageBox.Show("Settings have been updated!", "Confirmation", MessageBoxButton.OK, MessageBoxImage.Information);
-                LoadSettings(); // Reload settings in MainWindow after update
+                LoadSettings(); 
             }
         }
-
-        // Override the close event for confirmation
-        protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
-        {
-            base.OnClosing(e);
-
-            var result = MessageBox.Show("Are you sure you want to close the application?", "Confirm Exit",
-                MessageBoxButton.YesNo, MessageBoxImage.Question);
-
-            if (result == MessageBoxResult.No)
-            {
-                e.Cancel = true; // Prevent the window from closing
-            }
-        }
-
     }
 }
