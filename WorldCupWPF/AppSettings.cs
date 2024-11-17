@@ -26,6 +26,12 @@ namespace WorldCupWPF
                 DataSource = parts.Length > 2 ? parts[2] : "API" // Ensure a default value is provided
             };
         }
+        public static void SaveSettings(AppSettings settings)
+        {
+            var settingsData = $"{settings.Gender};{settings.Language};{settings.DataSource}";
+            File.WriteAllText("settings.txt", settingsData);
+        }
+
     }
 }
  

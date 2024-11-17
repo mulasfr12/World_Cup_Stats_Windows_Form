@@ -12,24 +12,35 @@ namespace WorldCupWPF
         {
             base.OnStartup(e);
 
-            // Load existing settings or prompt for settings
-            var settings = LoadSettings() ?? PromptForSettings();
+            // Check if settings.txt exists, otherwise open SettingsWindow
+            if (!File.Exists("settings.txt"))
+            {
+                var settingsWindow = new SettingsWindow();
+                if (settingsWindow.ShowDialog() != true) // If the user cancels the settings window
+                {
+                    Application.Current.Shutdown(); // Exit the application
+                    return;
+                }
+            }
 
+            // Load settings and set culture
+            var settings = AppSettings.LoadSettings();
             if (settings != null)
             {
-                var culture = settings.Language == "Croatian" ? new CultureInfo("hr") : new CultureInfo("en");
-                Thread.CurrentThread.CurrentCulture = culture;
-                Thread.CurrentThread.CurrentUICulture = culture;
-            }
-            else
-            {
-                // Default to English if settings are null or invalid
-                Thread.CurrentThread.CurrentCulture = new CultureInfo("en");
-                Thread.CurrentThread.CurrentUICulture = new CultureInfo("en");
+                SetCulture(settings.Language == "Croatian" ? "hr" : "en");
             }
 
+            // Launch the main window
             var mainWindow = new MainWindow();
             mainWindow.Show();
+        }
+
+
+        private void SetCulture(string cultureCode)
+        {
+            var culture = new CultureInfo(cultureCode);
+            Thread.CurrentThread.CurrentCulture = culture;
+            Thread.CurrentThread.CurrentUICulture = culture;
         }
 
         private AppSettings PromptForSettings()

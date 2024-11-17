@@ -1,0 +1,21 @@
+﻿<Window x:Class="WorldCupWPF.PlayerDetailsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WorldCupWPF"
+        mc:Ignorable="d"
+        Title="PlayerDetailsWindow" Height="300" Width="400">
+    <Grid Margin="10">
+        <StackPanel>
+            <TextBlock Text="Player Details" FontSize="18" FontWeight="Bold" Margin="0,0,0,10" HorizontalAlignment="Center"/>
+            <Image x:Name="PlayerImage" Width="100" Height="100" HorizontalAlignment="Center"/>
+            <TextBlock x:Name="PlayerName" FontSize="16" TextAlignment="Center"/>
+            <TextBlock x:Name="PlayerNumber" FontSize="14" TextAlignment="Center"/>
+            <TextBlock x:Name="PlayerPosition" FontSize="14" TextAlignment="Center"/>
+            <TextBlock x:Name="PlayerCaptain" FontSize="14" TextAlignment="Center"/>
+            <TextBlock x:Name="PlayerGoals" FontSize="14" TextAlignment="Center"/>
+            <TextBlock x:Name="PlayerYellowCards" FontSize="14" TextAlignment="Center"/>
+        </StackPanel>
+    </Grid>
+</Window>

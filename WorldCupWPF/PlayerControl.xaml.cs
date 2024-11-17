@@ -30,7 +30,19 @@ namespace WorldCupWPF
 
         public int ShirtNumber { get; set; }
         public ImageSource Image { get; set; }
+
+        public class PlayerControlEventArgs : EventArgs
+        {
+            public int ShirtNumber { get; set; }
+        }
+
+
+        public event EventHandler<PlayerControlEventArgs> PlayerSelected;
+
+        private void PlayerControl_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            // Handle player control click event here
+            MessageBox.Show($"Player clicked! Shirt Number: {ShirtNumber}");
+        }
     }
-
-
 }

@@ -3,6 +3,7 @@ using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Globalization;
+using System.Windows.Input;
 
 namespace WorldCupWPF
 {
@@ -31,6 +32,15 @@ namespace WorldCupWPF
             genderComboBox.SelectedItem = settings?.Gender ?? "Male";
             languageComboBox.SelectedItem = settings?.Language ?? "English";
             dataSourceComboBox.SelectedItem = settings?.DataSource ?? "API";
+            if (settings.Language == "Croatian")
+            {
+                Genderlbl.Content = "Spol";
+                Languagelbl.Content = "Jezik";
+                DataSourcelbl.Content = "Izvor podataka";
+                buttonConfirm.Content = "Ok";
+                buttonCancel.Content = "Otkazati";
+            }
+            
         }
 
         private void buttonConfirm_Click(object sender, RoutedEventArgs e)
@@ -54,23 +64,43 @@ namespace WorldCupWPF
             };
 
             App.SaveSettings(settings);  // Save using a method from App class to match new format
-            ApplyLocalization(selectedLanguage);
+            //ApplyLocalization(selectedLanguage);
             MessageBox.Show("Settings saved successfully.");
             this.DialogResult = true;
             this.Close();
         }
 
-        private void ApplyLocalization(string language)
-        {
-            var cultureCode = language == "Croatian" ? "hr" : "en";
-            var culture = new CultureInfo(cultureCode);
-            System.Threading.Thread.CurrentThread.CurrentCulture = culture;
-            System.Threading.Thread.CurrentThread.CurrentUICulture = culture;
-        }
+        //private void ApplyLocalization(string language)
+        //{
+        //    var cultureCode = language == "Croatian" ? "hr" : "en";
+        //    var culture = new CultureInfo(cultureCode);
+        //    System.Threading.Thread.CurrentThread.CurrentCulture = culture;
+        //    System.Threading.Thread.CurrentThread.CurrentUICulture = culture;
 
+        //    var dictionary = new ResourceDictionary
+        //    {
+        //        Source = new Uri($"Resources.{cultureCode}.xaml", UriKind.Relative)
+        //    };
+        //    Application.Current.Resources.MergedDictionaries.Clear();
+        //    Application.Current.Resources.MergedDictionaries.Add(dictionary);
+        //}
         private void buttonCancel_Click(object sender, RoutedEventArgs e)
         {
             this.DialogResult = false;  // Close without saving
         }
+        protected override void OnKeyDown(KeyEventArgs e)
+        {
+            base.OnKeyDown(e);
+
+            if (e.Key == Key.Enter) // Confirm
+            {
+                buttonConfirm_Click(this, new RoutedEventArgs());
+            }
+            else if (e.Key == Key.Escape) // Cancel
+            {
+                buttonCancel_Click(this, new RoutedEventArgs());
+            }
+        }
+
     }
 }

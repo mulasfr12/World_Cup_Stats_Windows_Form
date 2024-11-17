@@ -3,33 +3,39 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:WorldCupWPF"
+        xmlns:res="clr-namespace:WorldCupWPF.Properties"
+        xmlns:local ="clr-namespace:System.Windows.Resources;assembly=PresentationFramework"
         mc:Ignorable="d"
-        Title="MainWindow" Height="1000" Width="1000">
+        Title="MainWindow" Height="1033" Width="1048">
     <Grid Margin="0,0,-17,0">
-        <ComboBox x:Name="TeamCB" HorizontalAlignment="Left" Margin="92,53,0,0" VerticalAlignment="Top" Width="120" SelectionChanged="TeamCB_SelectionChanged"/>
-        <ComboBox x:Name="OpponentTeamCB" SelectionChanged="OpponentTeamCB_SelectionChanged" HorizontalAlignment="Left" Margin="722,53,0,0" VerticalAlignment="Top" Width="120"/>
-        <Label Content="Team " HorizontalAlignment="Left" Margin="114,17,0,0" VerticalAlignment="Top" Width="98"/>
-        <Label Content="Opponent" HorizontalAlignment="Left" Margin="722,25,0,0" VerticalAlignment="Top" Width="98"/>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="248*"/>
+            <ColumnDefinition Width="91*"/>
+        </Grid.ColumnDefinitions>
+        <Button x:Name="SettingsButton" Content="Settings" HorizontalAlignment="Left" Margin="153,10,0,0" VerticalAlignment="Top" Width="100" Click="SettingsButton_Click" Grid.Column="1"/>
+        <ComboBox x:Name="TeamCB" HorizontalAlignment="Left" Margin="92,67,0,0" VerticalAlignment="Top" Width="120" SelectionChanged="TeamCB_SelectionChanged"/>
+        <ComboBox x:Name="OpponentTeamCB" SelectionChanged="OpponentTeamCB_SelectionChanged" HorizontalAlignment="Left" Margin="722,67,0,0" VerticalAlignment="Top" Width="120" Grid.ColumnSpan="2"/>
+        <Label x:Name="Label_Team" Content="Team" HorizontalAlignment="Left" Margin="114,27,0,0" VerticalAlignment="Top" Width="98"/>
+        <Label x:Name="Label_Opponent" Content="Opponent" HorizontalAlignment="Left" Margin="733,28,0,0" VerticalAlignment="Top" Width="98" Grid.ColumnSpan="2"/>
         <Image x:Name="firstTeamFlag" HorizontalAlignment="Left" Height="58" Margin="129,94,0,0" VerticalAlignment="Top" Width="68"/>
         <Image x:Name="secondTeamFlag" HorizontalAlignment="Left" Height="58" Margin="603,94,0,0" VerticalAlignment="Top" Width="68" RenderTransformOrigin="0.527,0.047"/>
-        <TextBlock x:Name="matchResultTB" HorizontalAlignment="Center" Margin="0,51,0,0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top" Height="24" Width="80"/>
-        <Button x:Name="TeamInfoButton" Content="View Team Info" HorizontalAlignment="Left" Margin="10,25,0,0" VerticalAlignment="Top" Width="87" Click="TeamInfoButton_Click"/>
-        <Button x:Name="OpponentInfoButton" Content="View Team Info" HorizontalAlignment="Left" Margin="840,20,0,0" VerticalAlignment="Top" Width="100" RenderTransformOrigin="0.452,-0.568" Click="OpponentInfoButton_Click"/>
-        <Grid x:Name="LoadingOverlay" Visibility="Collapsed" Background="#80000000" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+        <TextBlock x:Name="matchResultTB" HorizontalAlignment="Left" Margin="468,51,0,0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top" Height="24" Width="80"/>
+        <Button x:Name="TeamInfoButton" Content="View Team Info" HorizontalAlignment="Left" Margin="10,31,0,0" VerticalAlignment="Top" Width="87" Click="TeamInfoButton_Click"/>
+        <Button x:Name="OpponentInfoButton" Content="View Team Info" HorizontalAlignment="Left" Margin="46,33,0,0" VerticalAlignment="Top" Width="100" RenderTransformOrigin="0.452,-0.568" Click="OpponentInfoButton_Click" Grid.Column="1"/>
+        <Grid x:Name="LoadingOverlay" Visibility="Collapsed" Background="#80000000" Grid.ColumnSpan="2">
             <ProgressBar IsIndeterminate="True" Width="200" Height="20" VerticalAlignment="Center" HorizontalAlignment="Center"/>
         </Grid>
-        <StackPanel HorizontalAlignment="Left" Height="8" Margin="882,-247,0,0" VerticalAlignment="Top" Width="1074"/>
-        <Grid Margin="10,75,20,0">
+        <StackPanel HorizontalAlignment="Left" Height="8" Margin="138,-247,0,0" VerticalAlignment="Top" Width="1074" Grid.Column="1"/>
+        <Grid Margin="10,75,20,0" Grid.ColumnSpan="2">
             <Image Source="Images/Football_Field.jpg" Stretch="UniformToFill" HorizontalAlignment="Center" VerticalAlignment="Top" Height="722" Width="509" Margin="0,42,0,0" />
         </Grid>
-        <Canvas x:Name="fieldCanvas" Margin="302,171,315,189" Width="400" Background="Transparent"/>
+        <Canvas x:Name="fieldCanvas" Margin="302,171,42,189" Width="400" Background="Transparent"/>
         <StackPanel x:Name="HomeTeamLineup" Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="20,0,0,0" Width="150">
-            <TextBlock Text="Home Team" FontSize="16" FontWeight="Bold" Margin="0,0,0,10"/>
+            <TextBlock x:Name="Home_Team" Text="Home Team" FontSize="16" FontWeight="Bold" Margin="0,0,0,10"/>
         </StackPanel>
 
-        <StackPanel x:Name="AwayTeamLineup" Orientation="Vertical" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,20,0" Width="150">
-            <TextBlock Text="Away Team" FontSize="16" FontWeight="Bold" Margin="0,0,0,10"/>
+        <StackPanel x:Name="AwayTeamLineup" Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="103,0,0,0" Width="150" Grid.Column="1">
+            <TextBlock x:Name="Away_Team" Text="Away Team" FontSize="16" FontWeight="Bold" Margin="0,0,0,10"/>
         </StackPanel>
     </Grid>
 </Window>

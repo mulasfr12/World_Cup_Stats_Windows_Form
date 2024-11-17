@@ -9,12 +9,12 @@
     <Grid>
         <ComboBox x:Name="genderComboBox" HorizontalAlignment="Left" Margin="299,104,0,0" VerticalAlignment="Top" Width="120"/>
         <ComboBox x:Name="languageComboBox" HorizontalAlignment="Left" Margin="299,169,0,0" VerticalAlignment="Top" Width="120"/>
-        <Label Content="Gender" HorizontalAlignment="Left" Margin="99,100,0,0" VerticalAlignment="Top"/>
-        <Label Content="Language" HorizontalAlignment="Left" Margin="99,165,0,0" VerticalAlignment="Top"/>
+        <Label x:Name="Genderlbl" Content="Gender" HorizontalAlignment="Left" Margin="99,100,0,0" VerticalAlignment="Top"/>
+        <Label x:Name="Languagelbl" Content="Language" HorizontalAlignment="Left" Margin="99,165,0,0" VerticalAlignment="Top"/>
         <Button x:Name="buttonConfirm" Content="Confirm" HorizontalAlignment="Left" Margin="154,321,0,0" VerticalAlignment="Top" Width="92" Click="buttonConfirm_Click"/>
         <Button x:Name="buttonCancel" Content="Cancel" HorizontalAlignment="Left" Margin="400,321,0,0" VerticalAlignment="Top" Width="96" Click="buttonCancel_Click"/>
         <ComboBox x:Name="dataSourceComboBox" HorizontalAlignment="Left" Margin="299,217,0,0" VerticalAlignment="Top" Width="120"/>
-        <Label Content="DataSource" HorizontalAlignment="Left" Margin="99,215,0,0" VerticalAlignment="Top"/>
+        <Label x:Name="DataSourcelbl" Content="DataSource" HorizontalAlignment="Left" Margin="99,215,0,0" VerticalAlignment="Top"/>
 
     </Grid>
 </Window>

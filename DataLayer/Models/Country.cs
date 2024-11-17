@@ -321,8 +321,6 @@ namespace DataLayer.Models
             public string wind_speed { get; set; }
             public string description { get; set; }
         }
-
-
     }
 }
 
