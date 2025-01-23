@@ -28,10 +28,26 @@ namespace WorldCupWPF
         {
             var settings = AppSettings.LoadSettings();
 
+            if (settings == null)
+            {
+                // Create a new settings instance with default values if none exist
+                settings = new AppSettings
+                {
+                    Gender = "Male",
+                    Language = "English",
+                    DataSource = "API"
+                };
+
+                // Save the default settings to avoid future null issues
+                App.SaveSettings(settings);
+            }
+
             // Set ComboBox selected items based on loaded settings
-            genderComboBox.SelectedItem = settings?.Gender ?? "Male";
-            languageComboBox.SelectedItem = settings?.Language ?? "English";
-            dataSourceComboBox.SelectedItem = settings?.DataSource ?? "API";
+            genderComboBox.SelectedItem = settings.Gender;
+            languageComboBox.SelectedItem = settings.Language;
+            dataSourceComboBox.SelectedItem = settings.DataSource;
+
+            // Update UI labels if the language is Croatian
             if (settings.Language == "Croatian")
             {
                 Genderlbl.Content = "Spol";
@@ -40,8 +56,8 @@ namespace WorldCupWPF
                 buttonConfirm.Content = "Ok";
                 buttonCancel.Content = "Otkazati";
             }
-            
         }
+
 
         private void buttonConfirm_Click(object sender, RoutedEventArgs e)
         {
